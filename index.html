@@ -1,0 +1,38 @@
+<html>
+
+</html>
+<script>
+    const init = () => {
+        const cache = localStorage.getItem('dataCache');
+        if (cache) {
+            const expiry = Date.parse(localStorage.getItem('expiry'))
+            if (new Date() > expiry) {
+                localStorage.clear()
+            }
+            document.body.innerHTML = cache
+            return
+        }
+        const password = prompt('Password')
+        if (password == null) return
+        fetch('https://c75r3g7yseqccsiewtkpbwtxqe0kowft.lambda-url.ap-southeast-2.on.aws/', {
+            method: 'POST',
+            body: JSON.stringify({ 'password': password }),
+        }).then((response) => {
+            if (response.status == 200) return response.text()
+            else {
+                init()
+                return null;
+            }
+        }).then((html) => {
+            if (html) {
+                document.body.innerHTML = html
+                localStorage.setItem('dataCache', html);
+                const now = new Date()
+                now.setSeconds(now.getSeconds() + 43200)
+                localStorage.setItem('expiry', now)
+            }
+        });
+    }
+    init()
+
+</script>
